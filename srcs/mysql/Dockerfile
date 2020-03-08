@@ -2,9 +2,7 @@ FROM alpine:latest
 
 MAINTAINER thbeaumo thbeaumo@student.42.fr
 
-WORKDIR /app
-
-VOLUME /app
+VOLUME /var/lib/mysql
 
 COPY init_mysql.sh /bin/init_mysql.sh
 

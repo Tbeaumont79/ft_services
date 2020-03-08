@@ -4,7 +4,7 @@ if [ -d /app/mysql ]; then
 	echo "MySql Dir is already created skiping database creation !"
 else
 	echo "MySql Dir is not found, Installing Database";
-	mysql_install_db --user=root > /dev/null
+	mysql_install_db --user=wordpressuser > /dev/null
 
 	if ["$MYSQL_ROOT_PASSWORD" = "" ]; then
 		MYSQL_ROOT_PASSWORD=root
