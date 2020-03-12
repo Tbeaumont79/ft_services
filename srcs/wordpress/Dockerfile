@@ -23,6 +23,7 @@ RUN apk update && \
 	chown -R lighttpd /usr/share/webapps/ && \
 	ln -s /usr/share/webapps/wordpress/ /var/www/localhost/htdocs/wordpress
 
+COPY wp-config.php /usr/share/weapps/wordpress
 COPY handledatabase handledatabase
 COPY script.sh script.sh
 
