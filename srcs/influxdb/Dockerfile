@@ -1,0 +1,47 @@
+FROM alpine:latest
+MAINTAINER thbeaumo <thbeaumo@student.42.fr>
+
+ENV INFLUXDB_VERSION 1.5.1
+ENV GLIBC_VERSION=2.25-r0
+ENV GOSU_VERSION=1.10
+
+RUN apk add --no-cache --virtual .build-deps wget gnupg tar ca-certificates && \
+    update-ca-certificates && \
+    gpg --keyserver hkp://ha.pool.sks-keyservers.net \
+        --recv-keys 05CE15085FC09D18E99EFB22684A14CF2582E0C5 && \
+    wget -q https://dl.influxdata.com/influxdb/releases/influxdb-${INFLUXDB_VERSION}-static_linux_amd64.tar.gz.asc && \
+    wget -q https://dl.influxdata.com/influxdb/releases/influxdb-${INFLUXDB_VERSION}-static_linux_amd64.tar.gz && \
+    gpg --batch --verify influxdb-${INFLUXDB_VERSION}-static_linux_amd64.tar.gz.asc influxdb-${INFLUXDB_VERSION}-static_linux_amd64.tar.gz && \
+    mkdir -p /usr/src && \
+    tar -C /usr/src -xzf influxdb-${INFLUXDB_VERSION}-static_linux_amd64.tar.gz && \
+    rm -f /usr/src/influxdb-*/influxdb.conf && \
+    chmod +x /usr/src/influxdb-*/* && \
+    cp -a /usr/src/influxdb-*/* /usr/bin/ && \
+    rm -rf *.tar.gz* /usr/src /root/.gnupg && \
+    apk del .build-deps
+
+RUN set -ex \
+ && addgroup -S grafana \
+ && adduser -S -G grafana grafana \
+ && apk add --no-cache ca-certificates openssl fontconfig bash curl \
+ && apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/community dumb-init \
+ && curl -sL https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-amd64 > /usr/sbin/gosu \
+ && chmod +x /usr/sbin/gosu  \
+ && wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub \
+ && wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}/glibc-${GLIBC_VERSION}.apk \
+ && apk add glibc-${GLIBC_VERSION}.apk \
+ && wget -q https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana-$GRAFANA_VERSION.linux-x64.tar.gz \
+ && tar -xzf grafana-$GRAFANA_VERSION.linux-x64.tar.gz \
+ && mv grafana-$GRAFANA_VERSION/ grafana/ \
+ && mv grafana/bin/* /usr/local/bin/ \
+ && mkdir -p /grafana/data /grafana/data/plugins /var/lib/grafana/ \
+ && ln -s /grafana/data/plugins /var/lib/grafana/plugins \
+ && grafana-cli plugins update-all \
+ && rm grafana-$GRAFANA_VERSION.linux-x64.tar.gz /etc/apk/keys/sgerrand.rsa.pub glibc-${GLIBC_VERSION}.apk \
+ && chown -R grafana:grafana /grafana \
+ && apk del curl
+
+VOLUME ["/grafana"]
+VOLUME ["/etc/influxdb", "/var/lib/influxdb"]
+
+EXPOSE 3000
