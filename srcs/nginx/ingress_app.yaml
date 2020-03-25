@@ -12,4 +12,13 @@ spec:
         backend:
           serviceName: nginx
           servicePort: 80
+      - path: /wordpress
+        backend:
+          serviceName: wordpress
+          servicePort: 5050
+      - path: /phpmyadmin
+        backend:
+          serviceName: phpmyadmin
+          servicePort: 5000 
+    
           
