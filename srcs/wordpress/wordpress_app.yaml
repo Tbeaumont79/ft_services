@@ -9,7 +9,6 @@ spec:
     - protocol: TCP
       port: 5050
       targetPort: 5050
-      nodePort: 30050 # temporaire car need to be handle by ingress
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
