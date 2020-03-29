@@ -20,11 +20,11 @@ spec:
   type: NodePort
   ports:
   - port: 1234
-    nodePort: 1234
+    nodePort: 30001
     protocol: TCP
     name: ssh
   - port: 443
-    nodePort: 443
+    nodePort: 30443
     protocol: TCP
     name: https
 ---
